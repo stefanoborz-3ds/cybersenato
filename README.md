@@ -1,2 +1,3 @@
 # slot_ecc
-Il progetto per la settimana di ECC in cui parliamo di un intervento del festival degli informatici senza frontiere.
+CyberSenato – Simulatore interattivo di slot machine e campagna di sensibilizzazione sui rischi del gioco d'azzardo. Progetto ECC realizzato con HTML, CSS e JavaScript.
+
