@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CyberSenato - Simulatore di dopamina</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <div class="logo">CyberSenato <small>Progetto ECC</small></div>
+    <button id="btnEsci" class="btn-secondary">Esci</button>
+  </header>
+
+  <main id="gioco">
+    <div class="header-game">
+      <h1>Gira la ruota</h1>
+      <p class="sub">Simulatore dei meccanismi di fidelizzazione e dopamina</p>
+    </div>
+
+    <div class="slot-container">
+      <div id="slot">
+        <div class="rullo-wrapper"><div class="rullo-strip" id="strip1"></div></div>
+        <div class="rullo-wrapper"><div class="rullo-strip" id="strip2"></div></div>
+        <div class="rullo-wrapper"><div class="rullo-strip" id="strip3"></div></div>
+      </div>
+
+      <div class="leva-box">
+        <div class="leva">
+          <div class="asta"></div>
+          <button id="btnLeva" class="pomello" aria-label="Tira la leva"></button>
+        </div>
+        <span class="leva-label">Tira</span>
+      </div>
+    </div>
+
+    <div class="message-box">
+      <p id="messaggio">Tira la leva per iniziare.</p>
+    </div>
+  </main>
+
+  <!-- Pubblicità: video/immagini scelti a caso ogni 30 secondi -->
+  <div id="pubblicita" class="modal nascosto">
+    <div class="box-pubblicita">
+      <span class="badge">Sponsorizzato</span>
+      <div id="adMedia" class="ad-media"></div>
+      <div class="educativo-box">
+        <p class="piccolo"><strong>Messaggio educativo:</strong> questa pubblicità è stata inserita da noi. Sulle piattaforme reali la tua attenzione viene venduta agli inserzionisti a ogni interazione.</p>
+      </div>
+      <button id="btnChiudiPubblicita" class="btn-primary" disabled>Chiudi tra 5 s</button>
+    </div>
+  </div>
+
+  <!-- Resoconto -->
+  <section id="resoconto" class="modal nascosto">
+    <div id="passoDomanda" class="card-modal">
+      <h2>Prima di uscire</h2>
+      <p>La percezione delle proprie azioni si altera durante il gioco.</p>
+      <label for="stima">Quante volte pensi di aver tirato la leva?</label>
+      <input type="number" id="stima" min="0" placeholder="La tua stima">
+      <button id="btnVediRisultato" class="btn-primary">Vedi il resoconto</button>
+    </div>
+
+    <div id="passoRisultati" class="card-modal report nascosto">
+      <h2>Il tuo report</h2>
+      <p class="sub-report">Cosa è successo mentre giocavi, e perché.</p>
+
+      <div id="numeri" class="numeri"></div>
+
+      <div class="blocco">
+        <h3>Stima e realtà</h3>
+        <div id="barre"></div>
+        <p id="testoGiri"></p>
+      </div>
+
+      <div class="blocco">
+        <h3>Cosa ti è successo davvero</h3>
+        <div id="esiti"></div>
+      </div>
+
+      <div class="blocco">
+        <h3>Il tempo che non hai usato</h3>
+        <p id="testoAlternative"></p>
+      </div>
+
+      <div class="blocco">
+        <h3>Come era costruita la simulazione</h3>
+        <p>Gli esiti non erano casuali: le probabilità erano impostate da noi. Il 30% dei giri dava una ricompensa, il 32% una quasi-vincita (due simboli uguali e uno diverso) e il 30% niente. Nessun giro era mai davvero a tuo favore: la quasi-vincita attiva comunque i circuiti della ricompensa e ti spinge a riprovare.</p>
+        <p>Anche l'aspetto era studiato. Il rosso crea urgenza, l'oro segnala ricompensa e il verde richiama fortuna, su uno sfondo scuro che li fa risaltare. Le pubblicità ogni 30 secondi interrompevano il flusso, ma il tempo che le seguiva ti sembrava già "perso" e rendeva più facile continuare.</p>
+      </div>
+
+      <p class="nota">Ipotesi dei calcoli: attenzione valutata 10 €/ora (stima illustrativa), camminata a 5 km/h, lettura di 40 pagine all'ora.</p>
+      <p class="frase">Il tempo non lo puoi rivincere. Non stavi guardando un video: stavi tirando una leva.</p>
+      <button id="btnRigioca" class="btn-primary">Torna alla simulazione</button>
+    </div>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>
