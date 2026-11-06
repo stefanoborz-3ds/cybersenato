@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CyberSenato - Simulatore di Dopamina</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <div class="logo">CYBER<span>SENATO</span> <small>| Progetto ECC</small></div>
+    <button id="btnEsci" class="btn-secondary">ESCI</button>
+  </header>
+
+  <main id="gioco">
+    <div class="header-game">
+      <h1>Gira la ruota</h1>
+      <p class="sub">Simulatore dei meccanismi di fidelizzazione e dopamina</p>
+    </div>
+
+    <div class="slot-container">
+      <!-- I tre rulli con animazione a scorrimento -->
+      <div id="slot">
+        <div class="rullo-wrapper"><div class="rullo-strip" id="strip1"></div></div>
+        <div class="rullo-wrapper"><div class="rullo-strip" id="strip2"></div></div>
+        <div class="rullo-wrapper"><div class="rullo-strip" id="strip3"></div></div>
+      </div>
+
+      <!-- Controllo a Slider Verticale sulla destra -->
+      <div class="slider-container">
+        <span class="slider-label">TIRA</span>
+        <input type="range" id="sliderSpin" min="0" max="100" value="0" orient="vertical">
+      </div>
+    </div>
+
+    <!-- Messaggio esito del giro -->
+    <div class="message-box">
+      <p id="messaggio">Trascina lo slider a destra o premi il pulsante per iniziare!</p>
+    </div>
+
+    <div class="pulsanti">
+      <button id="btnGira" class="btn-primary">GIRA!</button>
+    </div>
+  </main>
+
+  <!-- ===== PUBBLICITA' FINTA ===== -->
+  <div id="pubblicita" class="modal nascosto">
+    <div class="box-pubblicita">
+      <span class="badge">SPONSORIZZATO</span>
+      <h2>📢 OFFERTA IMPERDIBILE!</h2>
+      <p>Ottieni subito il 100% di attenzione extra con un solo click!</p>
+      <div class="educativo-box">
+        <p class="piccolo">⚠️ <strong>Messaggio educativo:</strong> Questa pubblicità è finta. Sui social media e nelle piattaforme di gioco, la tua attenzione viene monetizzata e venduta agli inserzionisti ad ogni interazione.</p>
+      </div>
+      <button id="btnChiudiPubblicita" class="btn-primary">Chiudi e continua</button>
+    </div>
+  </div>
+
+  <!-- ===== RESOCONTO FINALE (2 STEP) ===== -->
+  <section id="resoconto" class="modal nascosto">
+    <!-- Passo 1: Domanda sulla stima dei giri -->
+    <div id="passoDomanda" class="card-modal">
+      <h2>Prima di uscire...</h2>
+      <p>La percezione del tempo e delle azioni si altera durante il gioco.</p>
+      <label for="stima">Quante volte pensi di aver girato la ruota?</label>
+      <input type="number" id="stima" min="0" placeholder="Esercizio di stima">
+      <button id="btnVediRisultato" class="btn-primary">Vedi il resoconto completo</button>
+    </div>
+
+    <!-- Passo 2: Reportistica dati e impatto -->
+    <div id="passoRisultati" class="card-modal nascosto">
+      <h2>Il tuo report di sensibilizzazione</h2>
+
+      <div class="blocco">
+        <h3>⏱️ Tempo trascorso</h3>
+        <p id="testoTempo"></p>
+        <p id="testoAlternative" class="evidenza"></p>
+      </div>
+
+      <div class="blocco">
+        <h3>💰 Valore generato per la piattaforma</h3>
+        <p id="testoSoldi"></p>
+      </div>
+
+      <div class="blocco">
+        <h3>🎰 Stima vs Realtà dei tentativi</h3>
+        <p id="testoGiri"></p>
+      </div>
+
+      <p class="frase">«Il tempo non lo puoi rivincere. Non stavi guardando un video: stavi girando la ruota.»</p>
+      <button id="btnRigioca" class="btn-primary">Torna alla simulazione</button>
+    </div>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>
