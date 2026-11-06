@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Casino Colts - Slot Machine</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome per le icone -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Press+Start+2P&family=Rajdhani:wght@600;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Tipografia personalizzata per insegne Neon e Display */
+        .font-neon {
+            font-family: 'Pacifico', cursive;
+        }
+        .font-digital {
+            font-family: 'Press Start 2P', monospace;
+        }
+        .font-hud {
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        /* Effetti Glow e Neon */
+        .neon-text-red {
+            color: #ff3366;
+            text-shadow: 0 0 5px #ff3366, 0 0 10px #ff3366, 0 0 20px #ff0044, 0 0 40px #ff0044;
+        }
+        .neon-text-gold {
+            color: #ffdf00;
+            text-shadow: 0 0 5px #ffea00, 0 0 12px #ffaa00, 0 0 25px #d4af37;
+        }
+
+        /* Cornice e Gradienti Dorati/Metallici */
+        .gold-border {
+            border: 4px solid;
+            border-image: linear-gradient(to bottom, #ffe57f, #c59b27, #795516, #f5d061) 1;
+        }
+        
+        .gold-gradient-bg {
+            background: linear-gradient(135deg, #4a3500 0%, #b8860b 25%, #ffd700 50%, #b8860b 75%, #2a1e00 100%);
+        }
+
+        .gold-cabinet {
+            background: linear-gradient(180deg, #3d2806 0%, #7a5214 15%, #b5822a 30%, #5e3e0c 70%, #291a03 100%);
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8), 0 20px 40px rgba(0,0,0,0.9);
+        }
+
+        /* Luci sferiche animate sui lati */
+        .bulb {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background-color: #ffcc00;
+            box-shadow: 0 0 8px #ffcc00;
+            animation: pulse-bulb 1s infinite alternate;
+        }
+        .bulb:nth-child(even) {
+            animation-delay: 0.5s;
+        }
+
+        @keyframes pulse-bulb {
+            0% {
+                background-color: #ff3300;
+                box-shadow: 0 0 4px #ff3300;
+            }
+            100% {
+                background-color: #ffffaa;
+                box-shadow: 0 0 12px #ffff00, 0 0 20px #ffaa00;
+            }
+        }
+
+        /* Finestra e Rulli */
+        .reel-container {
+            perspective: 1000px;
+            background: linear-gradient(180deg, #111 0%, #222 50%, #111 100%);
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.9);
+        }
+        
+        .reel-window {
+            overflow: hidden;
+            height: 160px;
+            position: relative;
+        }
+
+        .reel-strip {
+            transition: transform 0.1s linear;
+        }
+
+        .reel-symbol {
+            height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            user-select: none;
+            filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.6));
+        }
+
+        /* Contenitore e Track dello Slider personalizzato per lo Spin */
+        .slider-track {
+            background: linear-gradient(180deg, #1a1a1a 0%, #333 50%, #1a1a1a 100%);
+            box-shadow: inset 0 0 10px #000;
+        }
+
+        .slider-handle {
+            background: linear-gradient(180deg, #ff4d4d 0%, #990000 100%);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.8), inset 0 2px 4px rgba(255,255,255,0.4);
+            cursor: grab;
+        }
+        .slider-handle:active {
+            cursor: grabbing;
+        }
+
+        /* Effetti Modal e Overlay */
+        .modal-bg {
+            background-color: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+        }
+    </style>
+</head>
+<body class="bg-stone-950 text-white min-h-screen flex flex-col justify-between overflow-x-hidden font-hud selection:bg-amber-500 selection:text-black">
+
+    <!-- BARRA DI NAVIGAZIONE SUPERIORE CON PULSANTE ESCI -->
+    <header class="w-full bg-stone-900/90 border-b border-amber-600/30 px-4 py-3 flex justify-between items-center z-50 shadow-lg backdrop-blur-md">
+        <div class="flex items-center gap-3">
+            <div class="text-amber-500 font-bold text-xl tracking-wider flex items-center gap-2">
+                <i class="fa-solid font-black fa-dice-d6 text-2xl text-amber-400"></i>
+                <span class="hidden sm:inline">ROYAL CASINO</span>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4 sm:gap-6">
+            <!-- Sound Toggle -->
+            <button id="soundToggleBtn" onclick="toggleAudio()" class="text-stone-400 hover:text-amber-400 transition p-2 rounded-full hover:bg-stone-800">
+                <i id="soundIcon" class="fa-solid fa-volume-high text-xl"></i>
+            </button>
+            
+            <!-- Pulsante Regole / Payout -->
+            <button onclick="openModal('paytableModal')" class="text-stone-400 hover:text-amber-400 transition flex items-center gap-1 text-sm font-bold uppercase tracking-wider bg-stone-800 px-3 py-1.5 rounded-lg border border-stone-700">
+                <i class="fa-solid fa-circle-info"></i>
+                <span class="hidden sm:inline">Tabella Premi</span>
+            </button>
+
+            <!-- PULSANTE ESCI -->
+            <button onclick="openModal('exitModal')" class="bg-red-700 hover:bg-red-600 text-white px-4 py-1.5 rounded-lg font-bold text-sm tracking-wide transition shadow-lg shadow-red-900/40 flex items-center gap-2 border border-red-500">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>ESCI</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- AREA CENTRALE GAME CABIN CONTAINER -->
+    <main class="flex-grow flex items-center justify-center p-2 sm:p-6 relative my-auto">
+        
+        <!-- BAGLIORE DI SFONDO -->
+        <div class="absolute w-96 h-96 bg-amber-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- STRUTTURA CABINET SLOT MACHINE -->
+        <div class="relative w-full max-w-4xl gold-cabinet rounded-3xl p-3 sm:p-6 border-4 border-amber-600/60 shadow-2xl flex flex-col items-center">
+            
+            <!-- STROBO / LUCI LATERALI SINISTRA -->
+            <div class="absolute left-2 top-24 bottom-24 flex flex-col justify-around py-4 z-10 hidden sm:flex">
+                <div class="bulb"></div>
+                <div class="bulb"></div>
+                <div class="bulb"></div>
+                <div class="bulb"></div>
+                <div class="bulb"></div>
+                <div class="bulb"></div>
+                <div class="bulb"></div>
+            </div>
+
+            <!-- STROBO / LUCI LATERALI DESTRAMENTE (PRIMA DELLO SLIDER) -->
+            <div class="absolute right-16 sm:right-20 top-24 bottom-24 flex flex-col justify-around py-4 z-10 hidden sm:flex">
+                <div class="bulb"></div>
+                <div class="bulb"></div>
+                <div class="bulb"></div>
+                <div class="bulb"></div>
+                <div class="bulb"></div>
+                <div class="bulb"></div>
+                <div class="bulb"></div>
+            </div>
+
+            <!-- INSEGNA SUPERIORE "CASINO" CON STELLA -->
+            <div class="w-full max-w-md bg-stone-900/90 rounded-t-2xl border-2 border-amber-500/50 p-4 text-center relative overflow-hidden shadow-inner mb-3">
+                <div class="absolute -top-1 left-1/2 -translate-x-1/2 text-amber-400 text-xs">
+                    <i class="fa-solid fa-star"></i>
+                </div>
+                <div class="text-3xl sm:text-5xl font-neon neon-text-red tracking-wide py-1">
+                    Casino
+                </div>
+                <div class="text-xs text-amber-400/70 tracking-widest uppercase">Premium Edition</div>
+            </div>
+
+            <!-- SEZIONE CENTRALE: RULLI + SLIDER DESTRO -->
+            <div class="w-full flex items-center justify-center gap-2 sm:gap-4 my-2">
+                
+                <!-- CORNICE RULLI -->
+                <div class="flex-grow max-w-xl bg-stone-900 rounded-xl p-3 sm:p-4 border-4 border-amber-500/80 shadow-2xl relative">
+                    
+                    <!-- Linea di vincita (Payline Indicator) -->
+                    <div class="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-1 bg-red-500/40 z-20 pointer-events-none flex justify-between items-center px-1">
+                        <div class="w-2 h-4 bg-red-500 rounded-r"></div>
+                        <div class="w-2 h-4 bg-red-500 rounded-l"></div>
+                    </div>
+
+                    <!-- GRIGLIA RULLI (3 COLONNE) -->
+                    <div class="grid grid-cols-3 gap-2 sm:gap-3 reel-container rounded-lg p-2 border-2 border-amber-950">
+                        <!-- Rullo 1 -->
+                        <div class="reel-window rounded bg-stone-950 border border-stone-800 shadow-inner">
+                            <div id="reel1" class="reel-strip">
+                                <!-- Generato via JS -->
+                            </div>
+                        </div>
+
+                        <!-- Rullo 2 -->
+                        <div class="reel-window rounded bg-stone-950 border border-stone-800 shadow-inner">
+                            <div id="reel2" class="reel-strip">
+                                <!-- Generato via JS -->
+                            </div>
+                        </div>
+
+                        <!-- Rullo 3 -->
+                        <div class="reel-window rounded bg-stone-950 border border-stone-800 shadow-inner">
+                            <div id="reel3" class="reel-strip">
+                                <!-- Generato via JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CONTROL SLIDER SULLA DESTRA (Richiesto in sostituzione della leva) -->
+                <div class="flex flex-col items-center justify-center h-full py-2 bg-stone-900/80 p-2 rounded-xl border border-amber-600/40 shadow-lg">
+                    <span class="text-[10px] text-amber-400 font-bold uppercase tracking-tighter mb-1 text-center">Gira</span>
+                    
+                    <!-- Track dello Slider Verticale -->
+                    <div id="sliderTrack" class="w-10 sm:w-12 h-44 sm:h-52 rounded-full slider-track relative flex justify-center items-start p-1 cursor-pointer select-none">
+                        <!-- Manopola Drag -->
+                        <div id="sliderHandle" class="w-8 sm:w-10 h-10 rounded-full slider-handle flex items-center justify-center border border-amber-300 text-amber-100 shadow-md transform transition-transform duration-75">
+                            <i class="fa-solid fa-arrows-up-down text-xs opacity-75"></i>
+                        </div>
+                    </div>
+
+                    <span class="text-[9px] text-stone-400 mt-1 uppercase font-semibold">Tira</span>
+                </div>
+            </div>
+
+            <!-- INSEGNA INFERIORE NEON "COLTS" -->
+            <div class="w-full max-w-md bg-stone-950/90 rounded-b-xl border border-amber-600/40 py-2 px-4 text-center my-2 shadow-inner">
+                <div class="text-2xl sm:text-4xl font-neon neon-text-red tracking-wider">
+                    Colts
+                </div>
+            </div>
+
+            <!-- CONTROLLI E DISPLAY HUD (Saldo, Puntata, Vincita, Pulsante Spin) -->
+            <div class="w-full bg-stone-900/90 rounded-xl p-3 sm:p-4 border border-amber-500/40 mt-2 grid grid-cols-2 md:grid-cols-4 gap-3 items-center">
+                
+                <!-- Display Crediti -->
+                <div class="bg-black/80 rounded-lg p-2 border border-amber-600/30 text-center">
+                    <span class="text-xs text-stone-400 block font-bold uppercase">Credito</span>
+                    <span id="creditDisplay" class="text-xl sm:text-2xl font-digital text-amber-400">1000</span>
+                </div>
+
+                <!-- Display Puntata & Controlli -->
+                <div class="bg-black/80 rounded-lg p-2 border border-amber-600/30 text-center flex flex-col justify-between">
+                    <span class="text-xs text-stone-400 block font-bold uppercase">Puntata</span>
+                    <div class="flex items-center justify-between mt-1">
+                        <button onclick="changeBet(-10)" class="w-7 h-7 bg-stone-800 hover:bg-stone-700 text-amber-400 font-bold rounded flex items-center justify-center">-</button>
+                        <span id="betDisplay" class="text-lg font-digital text-amber-300">10</span>
+                        <button onclick="changeBet(10)" class="w-7 h-7 bg-stone-800 hover:bg-stone-700 text-amber-400 font-bold rounded flex items-center justify-center">+</button>
+                    </div>
+                </div>
+
+                <!-- Display Ultima Vincita -->
+                <div class="bg-black/80 rounded-lg p-2 border border-amber-600/30 text-center">
+                    <span class="text-xs text-stone-400 block font-bold uppercase">Vincita</span>
+                    <span id="winDisplay" class="text-xl sm:text-2xl font-digital text-emerald-400">0</span>
+                </div>
+
+                <!-- Pulsante SPIN / GIRA Alternativo -->
+                <div class="col-span-2 md:col-span-1">
+                    <button id="spinBtn" onclick="triggerSpin()" class="w-full py-3 bg-gradient-to-r from-red-600 via-amber-600 to-red-600 hover:from-red-500 hover:to-red-500 text-white font-bold rounded-lg shadow-lg shadow-red-900/50 border border-amber-300 transform active:scale-95 transition tracking-wider text-lg uppercase flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span>GIOCA</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- TARGHETTA MODELLO INFERIORE -->
+            <div class="mt-3 bg-stone-950 px-4 py-0.5 rounded border border-stone-800">
+                <span class="text-[10px] font-digital text-cyan-400 tracking-widest">SLOT-19 CASINO COLTS</span>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="w-full bg-stone-950 border-t border-stone-900 py-2 px-4 text-center text-xs text-stone-500">
+        &copy; Casino Colts Slot Machine Interface. Tutti i diritti riservati. Gioco simulato senza denaro reale.
+    </footer>
+
+    <!-- MODALE TABELLA PREMI (PAYTABLE) -->
+    <div id="paytableModal" class="fixed inset-0 modal-bg z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-stone-900 border-2 border-amber-500 rounded-xl p-6 max-w-md w-full text-center relative shadow-2xl">
+            <button onclick="closeModal('paytableModal')" class="absolute top-3 right-3 text-stone-400 hover:text-white text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 class="text-2xl font-bold text-amber-400 mb-4 font-hud uppercase tracking-wider">Tabella Pagamenti</h3>
+            
+            <div class="space-y-3 text-left">
+                <div class="flex justify-between items-center bg-stone-800 p-2.5 rounded border border-stone-700">
+                    <span class="text-2xl">7️⃣ 7️⃣ 7️⃣</span>
+                    <span class="font-digital text-amber-400 text-sm">x100 Puntata</span>
+                </div>
+                <div class="flex justify-between items-center bg-stone-800 p-2.5 rounded border border-stone-700">
+                    <span class="text-2xl">⭐ ⭐ ⭐</span>
+                    <span class="font-digital text-amber-400 text-sm">x50 Puntata</span>
+                </div>
+                <div class="flex justify-between items-center bg-stone-800 p-2.5 rounded border border-stone-700">
+                    <span class="text-2xl">💎 💎 💎</span>
+                    <span class="font-digital text-amber-400 text-sm">x25 Puntata</span>
+                </div>
+                <div class="flex justify-between items-center bg-stone-800 p-2.5 rounded border border-stone-700">
+                    <span class="text-2xl">🔔 🔔 🔔</span>
+                    <span class="font-digital text-amber-400 text-sm">x10 Puntata</span>
+                </div>
+                <div class="flex justify-between items-center bg-stone-800 p-2.5 rounded border border-stone-700">
+                    <span class="text-2xl">🍒 🍒 🍒</span>
+                    <span class="font-digital text-amber-400 text-sm">x5 Puntata</span>
+                </div>
+            </div>
+
+            <button onclick="closeModal('paytableModal')" class="mt-6 w-full bg-amber-600 hover:bg-amber-500 text-black font-bold py-2 rounded transition">
+                CHIUDI
+            </button>
+        </div>
+    </div>
+
+    <!-- MODALE DI CONFERMA USCITA -->
+    <div id="exitModal" class="fixed inset-0 modal-bg z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-stone-900 border-2 border-red-600 rounded-xl p-6 max-w-sm w-full text-center relative shadow-2xl">
+            <div class="text-red-500 text-4xl mb-3">
+                <i class="fa-solid fa-door-open"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2 uppercase">Vuoi davvero uscire?</h3>
+            <p class="text-stone-400 text-sm mb-6">I tuoi crediti di gioco attuali verranno salvati nella sessione locale.</p>
+            
+            <div class="flex gap-3">
+                <button onclick="closeModal('exitModal')" class="w-1/2 bg-stone-800 hover:bg-stone-700 text-stone-300 font-bold py-2 rounded transition">
+                    ANNULLA
+                </button>
+                <button onclick="confirmExit()" class="w-1/2 bg-red-700 hover:bg-red-600 text-white font-bold py-2 rounded transition">
+                    ESCI ORA
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTIFICA MESSAGGI GAME (Toast Overlay) -->
+    <div id="toastMessage" class="fixed bottom-12 left-1/2 -translate-x-1/2 bg-amber-500 text-black font-bold px-6 py-2 rounded-full shadow-2xl border-2 border-white transition-opacity duration-300 opacity-0 pointer-events-none z-50 font-hud text-lg">
+        Messaggio
+    </div>
+
+    <!-- LOGICA JAVASCRIPT -->
+    <script>
+        // SIMBOLI DISPONIBILI NELLA SLOT
+        const SYMBOLS = [
+            { id: '7', emoji: '7️⃣', value: 100 },
+            { id: 'star', emoji: '⭐', value: 50 },
+            { id: 'diamond', emoji: '💎', value: 25 },
+            { id: 'bell', emoji: '🔔', value: 10 },
+            { id: 'cherry', emoji: '🍒', value: 5 }
+        ];
+
+        // STATO DEL GIOCO
+        let credits = 1000;
+        let bet = 10;
+        let isSpinning = false;
+        let audioMuted = false;
+
+        // ELEMENTI DOM
+        const creditDisplay = document.getElementById('creditDisplay');
+        const betDisplay = document.getElementById('betDisplay');
+        const winDisplay = document.getElementById('winDisplay');
+        const spinBtn = document.getElementById('spinBtn');
+        const sliderHandle = document.getElementById('sliderHandle');
+        const sliderTrack = document.getElementById('sliderTrack');
+
+        // INIZIALIZZAZIONE RULLI
+        const reels = [
+            document.getElementById('reel1'),
+            document.getElementById('reel2'),
+            document.getElementById('reel3')
+        ];
+
+        let reelStates = [0, 0, 0];
+
+        // Inizializza layout rulli
+        function initReels() {
+            reels.forEach((reel, index) => {
+                reel.innerHTML = '';
+                // Crea una striscia di simboli ripetuti per lo scorrimento
+                for (let i = 0; i < 15; i++) {
+                    const sym = SYMBOLS[i % SYMBOLS.length];
+                    const div = document.createElement('div');
+                    div.className = 'reel-symbol';
+                    div.innerText = sym.emoji;
+                    reel.appendChild(div);
+                }
+            });
+        }
+
+        // CAMBIA PUNTATA
+        function changeBet(amount) {
+            if (isSpinning) return;
+            playBeepSound(400, 0.05);
+            let newBet = bet + amount;
+            if (newBet >= 10 && newBet <= credits && newBet <= 200) {
+                bet = newBet;
+                betDisplay.innerText = bet;
+            } else if (newBet > credits) {
+                showToast("Crediti insufficienti per questa puntata!");
+            }
+        }
+
+        // LOGICA DELLO SPIN / ROTAZIONE
+        function triggerSpin() {
+            if (isSpinning) return;
+            if (credits < bet) {
+                showToast("Crediti insufficienti! Ricarica o riduci la puntata.");
+                playBeepSound(150, 0.2);
+                return;
+            }
+
+            // Dettrai puntata
+            credits -= bet;
+            creditDisplay.innerText = credits;
+            winDisplay.innerText = '0';
+            isSpinning = true;
+            spinBtn.disabled = true;
+            spinBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            playSpinAudio();
+
+            // Calcola risultati casuali per i 3 rulli
+            const results = [
+                Math.floor(Math.random() * SYMBOLS.length),
+                Math.floor(Math.random() * SYMBOLS.length),
+                Math.floor(Math.random() * SYMBOLS.length)
+            ];
+
+            // Anima ciascun rullo con ritardo sfalsato
+            const symbolHeight = 160;
+            reels.forEach((reel, index) => {
+                // Calcola lo spostamento CSS Y
+                const targetOffset = (10 + results[index]) * symbolHeight;
+                
+                reel.style.transition = `transform ${2 + index * 0.5}s cubic-bezier(0.1, 0.9, 0.2, 1)`;
+                reel.style.transform = `translateY(-${targetOffset}px)`;
+            });
+
+            // Al termine dell'animazione
+            setTimeout(() => {
+                evaluateWin(results);
+                resetReels(results);
+                isSpinning = false;
+                spinBtn.disabled = false;
+                spinBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }, 3200);
+        }
+
+        // RIPRISTINA POSIZIONE RULLI PER I SUCCESSIVI SPIN
+        function resetReels(results) {
+            reels.forEach((reel, index) => {
+                reel.style.transition = 'none';
+                const targetOffset = results[index] * 160;
+                reel.style.transform = `translateY(-${targetOffset}px)`;
+            });
+        }
+
+        // VALUTAZIONE VINCITA
+        function evaluateWin(results) {
+            const sym1 = SYMBOLS[results[0]];
+            const sym2 = SYMBOLS[results[1]];
+            const sym3 = SYMBOLS[results[2]];
+
+            let winAmount = 0;
+
+            // Tris perfetto
+            if (sym1.id === sym2.id && sym2.id === sym3.id) {
+                winAmount = bet * sym1.value;
+                showToast(`JACKPOT! Hai vinto ${winAmount} crediti! 🎉`);
+                playWinAudio(true);
+            } 
+            // Coppia (2 simboli uguali)
+            else if (sym1.id === sym2.id || sym2.id === sym3.id || sym1.id === sym3.id) {
+                winAmount = Math.floor(bet * 1.5);
+                showToast(`Coppia! Hai vinto ${winAmount} crediti!`);
+                playWinAudio(false);
+            } else {
+                playBeepSound(180, 0.1);
+            }
+
+            if (winAmount > 0) {
+                credits += winAmount;
+                creditDisplay.innerText = credits;
+                winDisplay.innerText = winAmount;
+            }
+        }
+
+        // CONTROL SLIDER INTERATTIVO (TRASCINAMENTO A DESTRA)
+        let isDragging = false;
+        let startY = 0;
+        let currentY = 0;
+        const maxDrag = 140; // Spostamento massimo verso il basso
+
+        sliderHandle.addEventListener('mousedown', startDrag);
+        sliderHandle.addEventListener('touchstart', startDrag, { passive: true });
+
+        window.addEventListener('mousemove', onDrag);
+        window.addEventListener('touchmove', onDrag, { passive: true });
+
+        window.addEventListener('mouseup', endDrag);
+        window.addEventListener('touchend', endDrag);
+
+        function startDrag(e) {
+            if (isSpinning) return;
+            isDragging = true;
+            startY = e.touches ? e.touches[0].clientY : e.clientY;
+        }
+
+        function onDrag(e) {
+            if (!isDragging || isSpinning) return;
+            const y = e.touches ? e.touches[0].clientY : e.clientY;
+            const deltaY = Math.max(0, Math.min(y - startY, maxDrag));
+            currentY = deltaY;
+
+            sliderHandle.style.transform = `translateY(${deltaY}px)`;
+
+            // Raggiunta la fine della corsa, attiva lo spin
+            if (deltaY >= maxDrag - 10) {
+                isDragging = false;
+                resetSlider();
+                triggerSpin();
+            }
+        }
+
+        function endDrag() {
+            if (!isDragging) return;
+            isDragging = false;
+            resetSlider();
+        }
+
+        function resetSlider() {
+            sliderHandle.style.transition = 'transform 0.2s ease-out';
+            sliderHandle.style.transform = 'translateY(0px)';
+            setTimeout(() => {
+                sliderHandle.style.transition = 'transform 0.075s linear';
+            }, 200);
+        }
+
+        // GESTIONE MODALI E NOTIFICHE
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function confirmExit() {
+            closeModal('exitModal');
+            showToast("Grazie per aver giocato a Casino Colts!");
+            setTimeout(() => {
+                alert("Sessione terminata. Puoi chiudere la scheda del browser.");
+            }, 800);
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toastMessage');
+            toast.innerText = msg;
+            toast.classList.remove('opacity-0');
+            toast.classList.add('opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0');
+            }, 2500);
+        }
+
+        // EFFETTI AUDIO CON WEB AUDIO API (Senza dipendenze esterne)
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new AudioContext();
+            }
+        }
+
+        function toggleAudio() {
+            audioMuted = !audioMuted;
+            const icon = document.getElementById('soundIcon');
+            if (audioMuted) {
+                icon.className = 'fa-solid fa-volume-xmark text-xl text-red-400';
+            } else {
+                icon.className = 'fa-solid fa-volume-high text-xl text-stone-400';
+            }
+        }
+
+        function playBeepSound(freq, duration) {
+            if (audioMuted) return;
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch(e){}
+        }
+
+        function playSpinAudio() {
+            if (audioMuted) return;
+            let counter = 0;
+            const interval = setInterval(() => {
+                playBeepSound(300 + (counter % 5) * 50, 0.04);
+                counter++;
+                if (counter > 25) clearInterval(interval);
+            }, 100);
+        }
+
+        function playWinAudio(isJackpot) {
+            if (audioMuted) return;
+            const notes = isJackpot ? [523, 659, 783, 1046] : [440, 554, 659];
+            notes.forEach((freq, idx) => {
+                setTimeout(() => {
+                    playBeepSound(freq, 0.25);
+                }, idx * 150);
+            });
+        }
+
+        // CARICAMENTO INIZIALE
+        window.onload = function() {
+            initReels();
+        };
+    </script>
+</body>
+</html>
