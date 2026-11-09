@@ -195,6 +195,14 @@ button { font: inherit; font-weight: 700; border: none; border-radius: 8px; padd
 .ad-media { margin: 16px 0; background: #000; border-radius: 8px; overflow: hidden; aspect-ratio: 16 / 9; max-height: 65vh; }
 .ad-media video, .ad-media img { width: 100%; height: 100%; object-fit: contain; }
 .placeholder { padding: 40px 16px; color: var(--muted); }
+.ad-media.verticale {
+  aspect-ratio: 9 / 16;
+  height: 65vh;
+  width: auto;
+  max-width: 100%;
+  margin: 16px auto;   /* centrato */
+}
+.ad-media.verticale video { object-fit: cover; }
 
 .educativo-box { background: var(--inset); border-left: 4px solid var(--green); padding: 12px; margin: 16px 0; text-align: left; }
 .piccolo { font-size: 14px; margin: 0; }
