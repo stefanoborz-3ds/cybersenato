@@ -107,6 +107,71 @@ function giraRullo(i, simbolo, durata) {
   }, 50);
 }
 
+// ===== Coriandoli =====
+var cv = $("coriandoli");
+var ctx = cv.getContext("2d");
+var pezzi = [];
+var animazioneAttiva = false;
+var COLORI_CONF = ["#ffc83d", "#ff2fd6", "#22e3ff", "#2ecc71", "#e63946", "#ffffff"];
+
+function adattaCanvas() {
+  cv.width = window.innerWidth;
+  cv.height = window.innerHeight;
+}
+adattaCanvas();
+window.addEventListener("resize", adattaCanvas);
+
+function lanciaCoriandoli() {
+  // due cannoni, uno per lato, che sparano verso il centro
+  for (var i = 0; i < 140; i++) {
+    var daSinistra = i % 2 === 0;
+    var angolo = (daSinistra ? -1 : -1) * (Math.PI / 4 + Math.random() * Math.PI / 4);
+    var velocita = 10 + Math.random() * 12;
+    pezzi.push({
+      x: daSinistra ? 0 : cv.width,
+      y: cv.height * 0.75,
+      vx: (daSinistra ? 1 : -1) * Math.abs(Math.cos(angolo)) * velocita,
+      vy: Math.sin(angolo) * velocita,
+      w: 6 + Math.random() * 8,
+      h: 10 + Math.random() * 10,
+      rot: Math.random() * Math.PI * 2,
+      vr: (Math.random() - 0.5) * 0.4,
+      colore: COLORI_CONF[Math.floor(Math.random() * COLORI_CONF.length)],
+      vita: 0
+    });
+  }
+  if (!animazioneAttiva) {
+    animazioneAttiva = true;
+    requestAnimationFrame(animaCoriandoli);
+  }
+}
+
+function animaCoriandoli() {
+  ctx.clearRect(0, 0, cv.width, cv.height);
+  for (var i = pezzi.length - 1; i >= 0; i--) {
+    var p = pezzi[i];
+    p.vy += 0.35;          // gravità
+    p.vx *= 0.99;          // attrito dell'aria
+    p.x += p.vx;
+    p.y += p.vy;
+    p.rot += p.vr;
+    p.vita++;
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rot);
+    ctx.fillStyle = p.colore;
+    ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+    ctx.restore();
+    if (p.y > cv.height + 40) pezzi.splice(i, 1);
+  }
+  if (pezzi.length > 0) {
+    requestAnimationFrame(animaCoriandoli);
+  } else {
+    animazioneAttiva = false;
+    ctx.clearRect(0, 0, cv.width, cv.height);
+  }
+}
+
 // ===== Leva =====
 $("btnLeva").addEventListener("click", function () {
   if (staGirando) return;
@@ -132,6 +197,7 @@ $("btnLeva").addEventListener("click", function () {
     $("messaggio").textContent = esito.messaggio;
     boxStato.className = "message-box stato-" + esito.tipo;
     stats[esito.tipo]++;
+    if (esito.tipo === "festa") lanciaCoriandoli();
 
     // Conta quante volte di fila esce lo stesso tipo di esito
     if (esito.tipo === ultimoTipo) serie++;
