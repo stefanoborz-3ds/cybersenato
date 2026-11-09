@@ -44,8 +44,8 @@ header {
   justify-content: space-between;
   align-items: center;
 }
-.logo { font-weight: 800; font-size: 20px; color: var(--cyan); text-shadow: 0 0 12px rgba(34, 227, 255, .8); }
-.logo small { font-size: 14px; color: var(--muted); font-weight: 400; margin-left: 8px; text-shadow: none; }
+.logo { font-weight: 800; font-size: 32px; color: var(--cyan); text-shadow: 0 0 12px rgba(34, 227, 255, .8); }
+.logo small { font-size: 20px; color: var(--muted); font-weight: 400; margin-left: 12px; text-shadow: none; }
 
 main {
   margin: auto;  
@@ -166,6 +166,7 @@ button { font: inherit; font-weight: 700; border: none; border-radius: 8px; padd
 .btn-primary:disabled { background: #2a3350; color: var(--muted); box-shadow: none; cursor: not-allowed; }
 .btn-secondary { background: #1b2440; color: var(--muted); }
 .btn-secondary:hover { color: #fff; box-shadow: 0 0 12px rgba(34, 227, 255, .5); }
+#btnEsci { font-size: 20px; padding: 16px 32px; }
 
 /* Finestre sovrapposte */
 .modal {
@@ -249,4 +250,7 @@ label { display: block; }
   main { padding: 32px 16px; }
   .slot-container { gap: 16px; margin: 24px 0; }
   #slot { gap: 8px; }
+    .logo { font-size: 22px; }
+  .logo small { font-size: 14px; margin-left: 8px; }
+  #btnEsci { font-size: 16px; padding: 12px 20px; }
 }
