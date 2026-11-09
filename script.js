@@ -14,14 +14,14 @@ function icona(nome) {
   return '<svg class="icona ' + nome + '" viewBox="0 0 24 24">' + ICONE[nome] + "</svg>";
 }
 var INTERVALLO_AD = 30;  // secondi tra una pubblicità e l'altra
-var ATTESA_CHIUDI = 5;   // secondi prima che si possa chiudere
+var ATTESA_CHIUDI = 7;   // secondi prima che si possa chiudere
 var TEMPI_RULLI = [1200, 2000, 2800];
 
 // Ogni pubblicità ha il suo file e il suo messaggio educativo (modifica i testi come vuoi)
 var pubblicita = [
-  { file: "assets/pubblicita.mp4",  messaggio: "Il tuo tempo ha un valore. Non lasciare che siano i social a decidere come spenderlo. Usa la tecnologia, non lasciare che sia lei a usare te." },
-  { file: "assets/pubblicita1.mp4", messaggio: "A volte ci perdiamo così tanto nel mondo dei social da dimenticarci di vivere quello reale. Non lasciare che uno schermo ti rubi il tempo, le esperienze e i momenti che contano davvero." },
-  { file: "assets/pubblicita2.mp4", messaggio: "Non tutto quello che trovi sui social è vero. Prima di credere a una notizia o condividerla, fermati, verifica la fonte e informati. Essere online non significa essere informati." }
+  { file: "assets/pubblicita.mp4",  verticale: true, messaggio: "Il tuo tempo ha un valore. Non lasciare che siano i social a decidere come spenderlo. Usa la tecnologia, non lasciare che sia lei a usare te." },
+  { file: "assets/pubblicita1.mp4", verticale: true, messaggio: "A volte ci perdiamo così tanto nel mondo dei social da dimenticarci di vivere quello reale. Non lasciare che uno schermo ti rubi il tempo, le esperienze e i momenti che contano davvero." },
+  { file: "assets/pubblicita2.mp4", verticale: true, messaggio: "Non tutto quello che trovi sui social è vero. Prima di credere a una notizia o condividerla, fermati, verifica la fonte e informati. Essere online non significa essere informati." }
 ];
 
 // Esiti: simbolo vincente (o null), messaggio, categoria
@@ -35,9 +35,9 @@ var MSG_QUASI = "Quasi. La quasi-vincita stimola comunque il rilascio di dopamin
 var MSG_NIENTE = "Nessuna vincita.";
 
 var info = {
-  festa: { nome: "Ricompensa", prog: 30, spiega: "Premi: non sai quando arriva il prossimo, quindi continui a tirare la leva. È il meccanismo più resistente per farti continuare a giocare." },
+  festa: { nome: "Ricompensa", prog: 20, spiega: "Premi: non sai quando arriva il prossimo, quindi continui a tirare la leva. È il meccanismo più resistente per farti continuare a giocare." },
   quasi: { nome: "Quasi-vincita", prog: 32, spiega: "Due simboli uguali e uno diverso. Il cervello la vive come un successo mancato per poco e ti spinge a riprovare." },
-  niente: { nome: "Nessun risultato", prog: 30, spiega: "Anche la perdita fa parte del ciclo: l'attesa del prossimo stimolo conta quanto il premio." },
+  niente: { nome: "Nessun risultato", prog: 40, spiega: "Anche la perdita fa parte del ciclo: l'attesa del prossimo stimolo conta quanto il premio." },
   pubblicita: { nome: "Pubblicità (simbolo megafono)", prog: 8, spiega: "La tua attenzione, interrotta e venduta all'inserzionista." }
 };
 
@@ -64,6 +64,11 @@ function avviaSuono() {
 function fermaSuono() {
   suonoGiro.pause();
 }
+var suonoVittoria = new Audio("assets/win.mp3");
+function avviaVittoria() {
+  suonoVittoria.currentTime = 0;
+  suonoVittoria.play().catch(function () {});
+}
 
 // ===== Rulli =====
 function resetRulli() {
@@ -82,18 +87,32 @@ function resetRulli() {
 }
 resetRulli();
 
+var vincenti = ["cuore", "campanella", "fiamma", "like", "utente"];
+
 function scegliEsito() {
   var n = Math.random() * 100;
-  if (n < 10) return { simboli: ["cuore", "cuore", "cuore"], tipo: "festa", messaggio: vincite[0].messaggio };
-  if (n < 20) return { simboli: ["campanella", "campanella", "campanella"], tipo: "festa", messaggio: vincite[1].messaggio };
-  if (n < 30) return { simboli: ["fiamma", "fiamma", "fiamma"], tipo: "festa", messaggio: vincite[2].messaggio };
-  if (n < 38) return { simboli: ["megafono", "megafono", "megafono"], tipo: "pubblicita", messaggio: vincite[3].messaggio };
-  if (n < 70) {
+  if (n < 20) {
+    var s = vincenti[Math.floor(n / 4)];   // 5 simboli x 4% = 20%
+    return { simboli: [s, s, s], tipo: "festa", messaggio: "Nuova Vincita!" };
+  }
+  if (n < 28) return { simboli: ["megafono", "megafono", "megafono"], tipo: "pubblicita", messaggio: vincite[3].messaggio };
+  if (n < 60) {
     var a = casuale(), b = casuale();
     while (b === a) b = casuale();
-    return { simboli: [a, a, b], tipo: "quasi", messaggio: MSG_QUASI };
+    var coppia = [a, a, b];
+    // la coppia non è sempre nelle prime due posizioni
+    var pos = Math.floor(Math.random() * 3);
+    if (pos === 1) coppia = [a, b, a];
+    if (pos === 2) coppia = [b, a, a];
+    return { simboli: coppia, tipo: "quasi", messaggio: MSG_QUASI };
   }
-  return { simboli: [simboli[0], simboli[1], simboli[2]], tipo: "niente", messaggio: MSG_NIENTE };
+  // niente: 3 simboli tutti diversi, in ordine casuale
+  var mix = simboli.slice();
+  for (var i = mix.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = mix[i]; mix[i] = mix[j]; mix[j] = t;
+  }
+  return { simboli: [mix[0], mix[1], mix[2]], tipo: "niente", messaggio: MSG_NIENTE };
 }
 
 function giraRullo(i, simbolo, durata) {
@@ -123,7 +142,7 @@ window.addEventListener("resize", adattaCanvas);
 
 function lanciaCoriandoli() {
   // due cannoni, uno per lato, che sparano verso il centro
-  for (var i = 0; i < 140; i++) {
+  for (var i = 0; i < 1000; i++) {
     var daSinistra = i % 2 === 0;
     var angolo = (daSinistra ? -1 : -1) * (Math.PI / 4 + Math.random() * Math.PI / 4);
     var velocita = 10 + Math.random() * 12;
@@ -209,6 +228,7 @@ $("btnLeva").addEventListener("click", function () {
     }
 
     fermaSuono();
+    if (esito.tipo === "festa") avviaVittoria();
     staGirando = false;
     $("btnLeva").disabled = false;
     if (esito.tipo === "pubblicita" || adInAttesa) {
@@ -228,6 +248,7 @@ function mostraPubblicita() {
   var box = $("adMedia");
   var v = document.createElement("video");
   var ad = pubblicita[Math.floor(Math.random() * pubblicita.length)];
+  box.className = "ad-media" + (ad.verticale ? " verticale" : "");
   v.src = ad.file;
   document.querySelector(".piccolo").innerHTML = "<strong>Messaggio educativo:</strong> " + ad.messaggio;
   v.loop = true;
