@@ -48,13 +48,13 @@ header {
 .logo small { font-size: 14px; color: var(--muted); font-weight: 400; margin-left: 8px; text-shadow: none; }
 
 main {
+  margin: auto;  
   width: 92%;
   max-width: 880px;
   background: var(--card);
   border: 2px solid rgba(34, 227, 255, .6);
   border-radius: 16px;
   padding: 48px 40px;
-  margin: 8px 0 40px;
   text-align: center;
   box-shadow: 0 0 32px rgba(34, 227, 255, .3), inset 0 0 32px rgba(34, 227, 255, .08);
 }
