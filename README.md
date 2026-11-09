@@ -16,4 +16,4 @@ Il nostro flusso di lavoro:
 
 - Infine abbiamo terminato la demo e finalizzato il materiale
 
-Il progetto nasce a scopo didattico ma abbiamo appreso molte cose nel corso di esso e speriamo di aiutare anche altri a capire l'importanza di questo argomento
+Il progetto nasce a scopo didattico, ma abbiamo appreso molte cose nel corso di esso e speriamo di aiutare anche altri a capire l'importanza di questo argomento
