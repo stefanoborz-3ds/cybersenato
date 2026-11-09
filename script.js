@@ -17,7 +17,12 @@ var INTERVALLO_AD = 30;  // secondi tra una pubblicità e l'altra
 var ATTESA_CHIUDI = 5;   // secondi prima che si possa chiudere
 var TEMPI_RULLI = [1200, 2000, 2800];
 
-var video = ["assets/pubblicita.mp4", "assets/pubblicita1.mp4", "assets/pubblicita2.mp4"];
+// Ogni pubblicità ha il suo file e il suo messaggio educativo (modifica i testi come vuoi)
+var pubblicita = [
+  { file: "assets/pubblicita.mp4",  messaggio: "Il tuo tempo ha un valore. Non lasciare che siano i social a decidere come spenderlo. Usa la tecnologia, non lasciare che sia lei a usare te." },
+  { file: "assets/pubblicita1.mp4", messaggio: "A volte ci perdiamo così tanto nel mondo dei social da dimenticarci di vivere quello reale. Non lasciare che uno schermo ti rubi il tempo, le esperienze e i momenti che contano davvero." },
+  { file: "assets/pubblicita2.mp4", messaggio: "Non tutto quello che trovi sui social è vero. Prima di credere a una notizia o condividerla, fermati, verifica la fonte e informati. Essere online non significa essere informati." }
+];
 
 // Esiti: simbolo vincente (o null), messaggio, categoria
 var vincite = [
@@ -27,10 +32,10 @@ var vincite = [
   { simbolo: "megafono", tipo: "pubblicita", messaggio: "Attenzione monetizzata." }
 ];
 var MSG_QUASI = "Quasi. La quasi-vincita stimola comunque il rilascio di dopamina.";
-var MSG_NIENTE = "Nessun risultato. Il ciclo di ricerca riparte subito.";
+var MSG_NIENTE = "Nessuna vincita.";
 
 var info = {
-  festa: { nome: "Ricompensa", prog: 30, spiega: "Premi imprevedibili (rinforzo a rapporto variabile): non sai quando arriva il prossimo, quindi continui a controllare. È il meccanismo più resistente all'abbandono." },
+  festa: { nome: "Ricompensa", prog: 30, spiega: "Premi: non sai quando arriva il prossimo, quindi continui a tirare la leva. È il meccanismo più resistente per farti continuare a giocare." },
   quasi: { nome: "Quasi-vincita", prog: 32, spiega: "Due simboli uguali e uno diverso. Il cervello la vive come un successo mancato per poco e ti spinge a riprovare." },
   niente: { nome: "Nessun risultato", prog: 30, spiega: "Anche la perdita fa parte del ciclo: l'attesa del prossimo stimolo conta quanto il premio." },
   pubblicita: { nome: "Pubblicità (simbolo megafono)", prog: 8, spiega: "La tua attenzione, interrotta e venduta all'inserzionista." }
@@ -156,7 +161,9 @@ function mostraPubblicita() {
 
   var box = $("adMedia");
   var v = document.createElement("video");
-  v.src = video[Math.floor(Math.random() * video.length)];
+  var ad = pubblicita[Math.floor(Math.random() * pubblicita.length)];
+  v.src = ad.file;
+  document.querySelector(".piccolo").innerHTML = "<strong>Messaggio educativo:</strong> " + ad.messaggio;
   v.loop = true;
   v.playsInline = true;
   v.play().catch(function () {      // audio bloccato dal browser: parte muto con i controlli
@@ -234,7 +241,7 @@ $("btnVediRisultato").addEventListener("click", function () {
   $("numeri").innerHTML =
     riquadro(m + " m " + s + " s", "sulla piattaforma") +
     riquadro(giri, "leve tirate") +
-    riquadro((ore * 10).toFixed(2).replace(".", ",") + " €", "Guadagni delle Aziende") +
+    riquadro((ore * 10 + 0.10 * adViste).toFixed(2).replace(".", ",") + " €", "Valore teorico generato per l'azienda") +
     riquadro(adViste, "pubblicità subite", "rosso");
 
   // Stima e realtà
