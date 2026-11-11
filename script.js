@@ -21,7 +21,7 @@ var TEMPI_RULLI = [1200, 2000, 2800];
 var pubblicita = [
   { file: "assets/pubblicita.mp4",  verticale: true, messaggio: "Il tuo tempo ha un valore. Non lasciare che siano i social a decidere come spenderlo. Usa la tecnologia, non lasciare che sia lei a usare te." },
   { file: "assets/pubblicita1.mp4", verticale: true, messaggio: "A volte ci perdiamo così tanto nel mondo dei social da dimenticarci di vivere quello reale. Non lasciare che uno schermo ti rubi il tempo, le esperienze e i momenti che contano davvero." },
-  { file: "assets/pubblicita2.mp4", verticale: true, messaggio: "Non tutto quello che trovi sui social è vero. Prima di credere a una notizia o condividerla, fermati, verifica la fonte e informati. Essere online non significa essere informati." }
+  { file: "assets/pubblicita1.mp4", verticale: true, messaggio: "Non tutto quello che trovi sui social è vero. Prima di credere a una notizia o condividerla, fermati, verifica la fonte e informati. Essere online non significa essere informati." }
 ];
 
 // Esiti: simbolo vincente (o null), messaggio, categoria
